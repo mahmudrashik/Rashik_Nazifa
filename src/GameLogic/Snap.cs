@@ -37,6 +37,7 @@ namespace CardGames.GameLogic
 		public Snap ()
 		{
 			_deck = new Deck ();
+			_gameTimer = SwinGame.CreateTimer ();
 		}
 
 		/// <summary>
@@ -92,6 +93,7 @@ namespace CardGames.GameLogic
 				_deck.Shuffle ();		// Return the cards and shuffle
 
 				FlipNextCard ();		// Flip the first card...
+				_gameTimer.Start();
 			}
 		}
 			
@@ -111,7 +113,11 @@ namespace CardGames.GameLogic
 		/// </summary>
 		public void Update()
 		{
-			//TODO: implement update to automatically slip cards!
+			if (_gameTimer.Ticks > _flipTime)
+			{
+			_gameTimer.Reset ();
+			FlipNextCard ();
+			}//TODO: implement update to automatically slip cards!
 		}
 
 		/// <summary>
@@ -119,12 +125,14 @@ namespace CardGames.GameLogic
 		/// </summary>
 		/// <value>The score.</value>
 		public int Score(int idx)
-		{
-			if ( idx >= 0 && idx < _score.Length )
-				return _score[idx]; 
-			else
-				return 0;
-		}
+{
+    if (_gameTimer.Ticks > _flipTime)
+    {
+        _gameTimer.Reset();
+        FlipNextCard();
+    }
+    return _score[idx];
+}
 
 		/// <summary>
 		/// The player hit the top of the cards "snap"! :)
@@ -139,6 +147,7 @@ namespace CardGames.GameLogic
 			{
 				_score[player]++;
 				//TODO: consider playing a sound here...
+				_gameTimer.Stop ();
 			}
 
 			// stop the game...
